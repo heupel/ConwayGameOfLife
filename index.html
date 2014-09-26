@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Conway's Game of Life</title>
+    <style type="text/css">
+        table {
+            cursor: pointer;
+        }
+        td {
+            border: 1px solid gray;
+            height: 15px;
+            width: 15px;
+        }
+        td.marked {
+            background-color: black;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+</head>
+<body>
+    <h1>Conway's Game of Life</h1>
+    <div id="wrapper">
+        <table id="board">
+        </table>
+    </div>
+    <script>
+        $(function () {
+            var $board = $('#board');
+            var mouseDown = false;
+            $board.on('mousedown', function (ev) {  mouseDown = true; ev.preventDefault(); });
+            $(document).on('mouseup', function () { mouseDown = false; });
+                
+            for (var i = 0; i < 30; ++i) {
+                var $row = $('<tr id="row' + i + '">').appendTo($board);
+                for (var j = 0; j < 60; ++j) {
+                    $cell = $('<td id="' + i + 'x' + j + '" data-x="' + i + '" data-y="' + j + '"></td>').appendTo($row);
+                    $cell.on('mouseenter', function () {
+                        if (mouseDown) {
+                            $(this).toggleClass('marked');
+                        }
+                    }).on('mousedown', function (ev) {
+                        mouseDown = true;
+                        ev.preventDefault();
+                        $(this).toggleClass('marked');
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
