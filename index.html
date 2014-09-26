@@ -34,7 +34,7 @@
             for (var i = 0; i < 30; ++i) {
                 var $row = $('<tr id="row' + i + '">').appendTo($board);
                 for (var j = 0; j < 60; ++j) {
-                    $cell = $('<td id="' + i + 'x' + j + '" data-x="' + i + '" data-y="' + j + '"></td>').appendTo($row);
+                    $cell = $('<td id="' + j + 'x' + i + '" data-x="' + j + '" data-y="' + i + '"></td>').appendTo($row);
                     $cell.on('mouseenter', function () {
                         if (mouseDown) {
                             $(this).toggleClass('marked');
