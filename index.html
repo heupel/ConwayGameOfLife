@@ -46,6 +46,20 @@
         </table>
     </div>
     <script>
+        // utility functions to make sure dead and live cells are painted properly
+        // use these functions to set and clear cells when calculating the next frame
+        var gol = {
+            utility: {
+                markCell: function (cell) {
+                    $(cell).addClass('marked').data('marked', true);
+                },
+                clearCell: function (cell) {
+                    $(cell).removeClass('marked').removeData('marked');
+                }
+            }
+        };
+        
+        // set up the board
         $(function () {
             var $board = $('#board');
             var mouseDown = false;
@@ -63,12 +77,22 @@
                         $cell = $('<td id="' + j + 'x' + i + '" data-x="' + j + '" data-y="' + i + '"></td>').appendTo($row);
                         $cell.height(cellSize).width(cellSize).on('mouseenter', function () {
                             if (mouseDown) {
-                                $(this).toggleClass('marked');
+                                if ($(this).data('marked')) {
+                                    gol.utility.clearCell(this);
+                                }
+                                else {
+                                    gol.utility.markCell(this);
+                                }
                             }
                         }).on('mousedown', function (ev) {
                             mouseDown = true;
                             ev.preventDefault();
-                            $(this).toggleClass('marked');
+                            if ($(this).data('marked')) {
+                                gol.utility.clearCell(this);
+                            }
+                            else {
+                                gol.utility.markCell(this);
+                            }
                         });
                     }
                 }
@@ -79,10 +103,12 @@
                 $('#' + id + 'Output').text($(this).val());
             }).on('change', function () {
                 drawBoard();
-            });
+            }).trigger('input');
             
             drawBoard();
         });
+        
+        // INSERT YOUR GAME LOOP HERE AND WIRE UP TO THE "startButton" BUTTON
     </script>
 </body>
 </html>
