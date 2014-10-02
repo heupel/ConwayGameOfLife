@@ -19,7 +19,7 @@
         td {
             border: 1px solid gray;
         }
-        td.marked {
+        td.live {
             background-color: black;
         }
     </style>
@@ -51,10 +51,18 @@
         var gol = {
             utility: {
                 markCell: function (cell) {
-                    $(cell).addClass('marked').data('marked', true);
+                    $(cell).addClass('live').data('alive', true);
                 },
                 clearCell: function (cell) {
-                    $(cell).removeClass('marked').removeData('marked');
+                    $(cell).removeClass('live').removeData('alive');
+                },
+                toggleCell: function (cell) {
+                    if ($(cell).data('alive')) {
+                        gol.utility.clearCell(cell);
+                    }
+                    else {
+                        gol.utility.markCell(cell);
+                    }
                 }
             }
         };
@@ -77,22 +85,12 @@
                         $cell = $('<td id="' + j + 'x' + i + '" data-x="' + j + '" data-y="' + i + '"></td>').appendTo($row);
                         $cell.height(cellSize).width(cellSize).on('mouseenter', function () {
                             if (mouseDown) {
-                                if ($(this).data('marked')) {
-                                    gol.utility.clearCell(this);
-                                }
-                                else {
-                                    gol.utility.markCell(this);
-                                }
+                                gol.utility.toggleCell(this);
                             }
                         }).on('mousedown', function (ev) {
                             mouseDown = true;
                             ev.preventDefault();
-                            if ($(this).data('marked')) {
-                                gol.utility.clearCell(this);
-                            }
-                            else {
-                                gol.utility.markCell(this);
-                            }
+                            gol.utility.toggleCell(this);
                         });
                     }
                 }
