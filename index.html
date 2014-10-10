@@ -66,7 +66,7 @@
         /////
     </script>
     <script>
-        // draw the board
+        // initialize controls and draw the board
         (function () {
             var board = document.getElementById('board');
             var mouseDown = false;
@@ -92,8 +92,7 @@
                 clearButton.addEventListener('click', function () {
                     var markedTds = document.querySelectorAll('td.marked');
                     for (var i = 0; i < markedTds.length; ++i) {
-                        var markedTd = markedTds[i];
-                        markedTd.className = markedTd.className.replace(/\bmarked\b/g, '');
+                        gol.utility.clearCell(markedTds[i]);
                     }
                 });
             }
