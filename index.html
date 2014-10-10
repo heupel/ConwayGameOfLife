@@ -19,7 +19,7 @@
         td {
             border: 1px solid gray;
         }
-        td.live {
+        td.marked {
             background-color: black;
         }
     </style>
@@ -39,6 +39,7 @@
     </div>
     <div id="runControls">
         <button id="runButton">Start</button>
+        <button id="clearButton">Clear</button>
     </div>
     <div id="wrapper">
         <table id="board">
@@ -50,18 +51,19 @@
         // use these functions to set and clear cells when calculating the next frame
         var gol = {
             utility: {
-                markCell: function (cell) {
-                    $(cell).addClass('live').data('alive', true);
+                markCell: function (tableCell) {
+                    $(tableCell).addClass('marked');
                 },
-                clearCell: function (cell) {
-                    $(cell).removeClass('live').removeData('alive');
+                clearCell: function (tableCell) {
+                    $(tableCell).removeClass('marked');
                 },
-                toggleCell: function (cell) {
-                    if ($(cell).data('alive')) {
-                        gol.utility.clearCell(cell);
+                toggleCell: function (tableCell) {
+                    var marked = $(tableCell).hasClass('marked');
+                    if ($(tableCell).hasClass('marked')) {
+                        gol.utility.clearCell(tableCell);
                     }
                     else {
-                        gol.utility.markCell(cell);
+                        gol.utility.markCell(tableCell);
                     }
                 }
             }
@@ -107,6 +109,10 @@
             }).on('change', function () {
                 drawBoard();
             }).trigger('input');
+            
+            $('#clearButton').on('click', function () {
+                $('td.marked').removeClass('marked');
+            });
             
             drawBoard();
         });
