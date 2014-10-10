@@ -54,9 +54,6 @@
                 },
                 clearCell: function (tableCell) {
                     tableCell.classList.remove('marked');
-                },
-                toggleCell: function (tableCell) {
-                    tableCell.classList.toggle('marked');
                 }
             }
         };
@@ -98,6 +95,10 @@
             }
             
             function drawBoard() {
+                function toggleCell(tableCell) {
+                    tableCell.classList.toggle('marked');
+                }
+                
                 while (board.lastChild) {
                     board.removeChild(board.lastChild);
                 }
@@ -116,13 +117,13 @@
                         tCell.width = cellSize;
                         tCell.addEventListener('mouseover', function (ev) {
                             if (mouseDown) {
-                                gol.utility.toggleCell(ev.target);
+                                toggleCell(ev.target);
                             }
                         });
                         tCell.addEventListener('mousedown', function (ev) {
                             mouseDown = true;
                             ev.preventDefault();
-                            gol.utility.toggleCell(ev.target);
+                            toggleCell(ev.target);
                         });
                     }
                 }
