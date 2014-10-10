@@ -44,26 +44,19 @@
     <div id="wrapper">
         <table id="board"></table>
     </div>
-    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script>
         // utility functions to make sure dead and live cells are painted properly
         // use these functions to set and clear cells when updating the UI
         var gol = {
             utility: {
                 markCell: function (tableCell) {
-                    $(tableCell).addClass('marked');
+                    tableCell.classList.add('marked');
                 },
                 clearCell: function (tableCell) {
-                    $(tableCell).removeClass('marked');
+                    tableCell.classList.remove('marked');
                 },
                 toggleCell: function (tableCell) {
-                    var marked = $(tableCell).hasClass('marked');
-                    if ($(tableCell).hasClass('marked')) {
-                        gol.utility.clearCell(tableCell);
-                    }
-                    else {
-                        gol.utility.markCell(tableCell);
-                    }
+                    tableCell.classList.toggle('marked');
                 }
             }
         };
@@ -73,48 +66,77 @@
         /////
     </script>
     <script>
-        // set up the board
-        $(function () {
-            var $board = $('#board');
+        // draw the board
+        (function () {
+            var board = document.getElementById('board');
             var mouseDown = false;
-            $board.on('mousedown', function (ev) {  mouseDown = true; ev.preventDefault(); });
-            $(document).on('mouseup', function () { mouseDown = false; });
+            board.addEventListener('mousedown', function (ev) {  mouseDown = true; ev.preventDefault(); });
+            document.addEventListener('mouseup', function () { mouseDown = false; });
+            
+            function initInputs() {
+                var inputs = document.querySelectorAll('#boardControls input');
+                for (var i = 0; i < inputs.length; ++i) {
+                    var input = inputs[i];
+                    input.addEventListener('input', function (ev) {
+                        document.getElementById(ev.target.id + 'Output').innerHTML = ev.target.value;
+                    });
+                    input.addEventListener('change', function () {
+                        drawBoard();
+                    });
+                    input.dispatchEvent(new Event('input'));
+                }
+            }
+            
+            function initClearButton() {
+                var clearButton = document.getElementById('clearButton');
+                clearButton.addEventListener('click', function () {
+                    var markedTds = document.querySelectorAll('td.marked');
+                    for (var i = 0; i < markedTds.length; ++i) {
+                        var markedTd = markedTds[i];
+                        markedTd.className = markedTd.className.replace(/\bmarked\b/g, '');
+                    }
+                });
+            }
             
             function drawBoard() {
-                $board.empty();
-                var rowCount = $('#rowCount').val();
-                var columnCount = $('#columnCount').val();
-                var cellSize = $('#cellSize').val();
+                while (board.lastChild) {
+                    board.removeChild(board.lastChild);
+                }
+                var rowCount = +document.getElementById('rowCount').value || 0;
+                var columnCount = +document.getElementById('columnCount').value || 0;
+                var cellSize = +document.getElementById('cellSize').value || 0;
                 for (var i = 0; i < rowCount; ++i) {
-                    var $row = $('<tr id="row' + i + '">').appendTo($board);
+                    var row = document.createElement('tr');
+                    row.id = 'row' + i;
+                    board.appendChild(row);
                     for (var j = 0; j < columnCount; ++j) {
-                        $cell = $('<td id="' + j + 'x' + i + '" data-x="' + j + '" data-y="' + i + '"></td>').appendTo($row);
-                        $cell.height(cellSize).width(cellSize).on('mouseenter', function () {
+                        var tCell = document.createElement('td');
+                        tCell.id = j + 'x' + i;
+                        row.appendChild(tCell);
+                        tCell.height = cellSize;
+                        tCell.width = cellSize;
+                        tCell.addEventListener('mouseover', function (ev) {
                             if (mouseDown) {
-                                gol.utility.toggleCell(this);
+                                gol.utility.toggleCell(ev.target);
                             }
-                        }).on('mousedown', function (ev) {
+                        });
+                        tCell.addEventListener('mousedown', function (ev) {
                             mouseDown = true;
                             ev.preventDefault();
-                            gol.utility.toggleCell(this);
+                            gol.utility.toggleCell(ev.target);
                         });
                     }
                 }
             }
             
-            $('#boardControls input').on('input', function () {
-                var id = $(this).attr('id');
-                $('#' + id + 'Output').text($(this).val());
-            }).on('change', function () {
-                drawBoard();
-            }).trigger('input');
-            
-            $('#clearButton').on('click', function () {
-                $('td.marked').removeClass('marked');
+            document.addEventListener('readystatechange', function () {
+                if (document.readyState === 'complete') {
+                    initInputs();
+                    initClearButton();
+                    drawBoard();
+                }
             });
-            
-            drawBoard();
-        });
+        })();
     </script>
 </body>
 </html>
