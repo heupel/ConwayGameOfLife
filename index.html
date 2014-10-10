@@ -73,7 +73,7 @@
             board.addEventListener('mousedown', function (ev) {  mouseDown = true; ev.preventDefault(); });
             document.addEventListener('mouseup', function () { mouseDown = false; });
             
-            function initInputs() {
+            function initSliders() {
                 var inputs = document.querySelectorAll('#boardControls input');
                 for (var i = 0; i < inputs.length; ++i) {
                     var input = inputs[i];
@@ -130,7 +130,7 @@
             
             document.addEventListener('readystatechange', function () {
                 if (document.readyState === 'complete') {
-                    initInputs();
+                    initSliders();
                     initClearButton();
                     drawBoard();
                 }
