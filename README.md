@@ -14,6 +14,6 @@ Oh, you're supposed to implement the Game of Life in JavaScript. If you don't kn
 
 ## Hmm anything else I should know?
 
-Yeah the current **index.html** doesn't work in Internet Explorer (tested on IE 11). I didn't bother to put any IE-specific shims into the event handling of the UI and this project is too small and narrowly focused to bother fixing this so use Firefox, Safari, or Chrome instead.
+Yeah the current **index.html** doesn't work in Internet Explorer (tested on IE 11). I didn't bother to put any IE-specific shims into the event handling of the UI and this project is too small and narrowly focused to bother fixing so use Firefox, Safari, or Chrome instead.
 
 Also if Game of Life bores you there are a couple variants listed [here](http://en.wikipedia.org/wiki/Langton's_ant).
