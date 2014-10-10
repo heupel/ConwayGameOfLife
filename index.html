@@ -72,7 +72,8 @@
             
             function initSliders() {
                 var inputs = document.querySelectorAll('#boardControls input');
-                for (var i = 0; i < inputs.length; ++i) {
+                var inputsCount = inputs.length;
+                for (var i = 0; i < inputsCount; ++i) {
                     var input = inputs[i];
                     input.addEventListener('input', function (ev) {
                         document.getElementById(ev.target.id + 'Output').innerHTML = ev.target.value;
@@ -88,7 +89,8 @@
                 var clearButton = document.getElementById('clearButton');
                 clearButton.addEventListener('click', function () {
                     var markedTds = document.querySelectorAll('td.marked');
-                    for (var i = 0; i < markedTds.length; ++i) {
+                    var markedTdCount = markedTds.length;
+                    for (var i = 0; i < markedTdCount; ++i) {
                         gol.utility.clearCell(markedTds[i]);
                     }
                 });
