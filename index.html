@@ -42,13 +42,12 @@
         <button id="clearButton">Clear</button>
     </div>
     <div id="wrapper">
-        <table id="board">
-        </table>
+        <table id="board"></table>
     </div>
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script>
         // utility functions to make sure dead and live cells are painted properly
-        // use these functions to set and clear cells when calculating the next frame
+        // use these functions to set and clear cells when updating the UI
         var gol = {
             utility: {
                 markCell: function (tableCell) {
