@@ -57,7 +57,7 @@
                 }
             }
         };
-        
+
         /////
         // Insert your game logic here and wire up to the "runButton" control
         /////
@@ -69,7 +69,7 @@
             var mouseDown = false;
             board.addEventListener('mousedown', function (ev) {  mouseDown = true; ev.preventDefault(); });
             document.addEventListener('mouseup', function () { mouseDown = false; });
-            
+
             function initSliders() {
                 var inputs = document.querySelectorAll('#boardControls input');
                 var inputsCount = inputs.length;
@@ -84,7 +84,7 @@
                     input.dispatchEvent(new Event('input'));
                 }
             }
-            
+
             function initClearButton() {
                 var clearButton = document.getElementById('clearButton');
                 clearButton.addEventListener('click', function () {
@@ -95,12 +95,43 @@
                     }
                 });
             }
-            
+
+            /////
+            // Tony's initStartButton
+            ////
+
+            function initStartButton() {
+              var START_BUTTON_STATES = {
+                start: "Start",
+                stop: "Stop"
+              };
+
+              var startButton = document.getElementById('runButton');
+              if (startButton === null) {
+                throw new Error("No start button found.");
+              }
+
+              startButton.addEventListener('click', function (ev) {
+                if (gol.engine === "undefined") {
+                  alert("The game engine is not properly defined.");
+                }
+
+                if (startButton.innerHTML === START_BUTTON_STATES.start) {
+                  startButton.innerHTML = START_BUTTON_STATES.stop;
+                  gol.engine.start(board);
+                }
+                else {
+                  startButton.innerHTML = START_BUTTON_STATES.start;
+                  gol.engine.stop("Stop button pressed");
+                }
+              });
+            }
+
             function drawBoard() {
                 function toggleCell(tableCell) {
                     tableCell.classList.toggle('marked');
                 }
-                
+
                 while (board.lastChild) {
                     board.removeChild(board.lastChild);
                 }
@@ -130,15 +161,18 @@
                     }
                 }
             }
-            
+
             document.addEventListener('readystatechange', function () {
                 if (document.readyState === 'complete') {
                     initSliders();
                     initClearButton();
+                    initStartButton();
                     drawBoard();
                 }
             });
         })();
     </script>
+
+    <script type="text/javascript" src="./gol-engine.js"></script>
 </body>
 </html>
