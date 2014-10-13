@@ -21,7 +21,7 @@ Oh, you're supposed to implement the Game of Life in JavaScript. If you don't kn
 NO! The goal of this workshop is to exercise some of the JavaScript best practices we've been studying while implementing a visually interesting simulation. Some practices to keep in mind:
 
 - don't pollute the global space! the `gol` root object on which the utilities are defined can be used for this, or you can define your own encapsulation
-- avoid using the constructor invocation pattern
+- see if you can avoid using the constructor invocation pattern (what are the tradeoffs here?)
 - despite the previous point, use proper logical encapsulation and abstraction; create modules and objects that make sense and model the problem clearly
 - remember closures allow you both to simulate object construction and encapsulation (privately accessible members)
 - functions are first-class citizens! some abstractions may more naturally be modelled as a function instead of an object with methods
