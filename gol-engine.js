@@ -8,15 +8,18 @@ gol.engine = {
   gameLoopInterval: null,
 
   start: function(displayBoard, framesPerSecond) {
+    var existingCellIsMarked = function (displayBoardCell) {
+      return displayBoardCell.classList.contains("marked");
+    };
+
     var translateDisplayBoardToWorkingBoard = function(displayBoard) {
 
       var processRow = function(displayBoardRow) {
         var processColumn = function(displayBoardColumn) {
           return {
-            marked: displayBoardColumn.classList.contains("marked"),
+            marked: existingCellIsMarked(displayBoardColumn),
             displayBoardColumn: displayBoardColumn
           };
-
         };
         var workingRow = [];
         var displayBoardColumns = displayBoardRow.getElementsByTagName("td");
@@ -47,8 +50,98 @@ gol.engine = {
 
     var processGeneration = function(workingBoard) {
       console.log("doing work: " + Date.now());
-      workingBoard[5][2].marked = true; // Just test updating marked property
-      console.log(workingBoard);
+
+	  var processCellGeneration = function (rowIndex, columnIndex) {
+      console.log(rowIndex + " " + columnIndex);
+		  // ---RULES---
+		  // Any live cell with fewer than two live neighbours dies, as if caused by under-population.
+		  // Any live cell with two or three live neighbours lives on to the next generation.
+		  // Any live cell with more than three live neighbours dies, as if by overcrowding.
+		  // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+		  var getLiveNeighborCount = function () {
+			  var getLiveMembersInRowColumnRange = function (currentRowIndex, startColumnIndex, endColumnIndex) {
+				  var liveCells = 0;
+          console.log("live members in row: " + currentRowIndex + " " + startColumnIndex + " " + endColumnIndex);
+
+				  for (var currentColumnIndex = startColumnIndex; currentColumnIndex <= endColumnIndex; currentColumnIndex += 1) {
+					  if ((rowIndex != currentRowIndex || columnIndex != currentColumnIndex) &&
+					      (existingCellIsMarked(workingBoard[currentRowIndex][currentColumnIndex].displayBoardColumn))) {
+						  liveCells += 1;
+					  }
+				  }
+
+				  return liveCells;
+			  };
+			  var totalLiveNeighbors = 0;
+			  var startRowIndex = rowIndex > 0 ? rowIndex - 1 : rowIndex;
+			  var endRowIndex = rowIndex < workingBoard.length - 1 ? rowIndex + 1 : rowIndex;
+			  var startColumnIndex = columnIndex > 0 ? columnIndex - 1 : columnIndex;
+			  var endColumnIndex = columnIndex < workingBoard[rowIndex].length - 1 ? columnIndex + 1 : columnIndex;
+			  var liveNeighborsCount = 0;
+
+			  for (var currentRowIndex = startRowIndex; currentRowIndex <= endRowIndex; currentRowIndex += 1) {
+				  liveNeighborsCount += getLiveMembersInRowColumnRange(currentRowIndex, startColumnIndex, endColumnIndex);
+			  }
+
+			  return liveNeighborsCount;
+
+		  };
+
+		  var liveNeighborCount = getLiveNeighborCount();
+
+		  var isUnderpopulated = function () {
+			  return liveNeighborCount < 2;
+		  };
+
+		  var isStatic = function () {
+			  return liveNeighborCount >= 2 && liveNeighborCount <= 3;
+		  };
+
+		  var isOvercrowded = function () {
+			  return liveNeighborCount > 3;
+		  };
+
+		  var isBornByReproduction = function () {
+			  return liveNeighborCount == 3;
+		  };
+
+		  var liveCellDies = function () {
+			  return isUnderpopulated() || isOvercrowded();
+		  };
+
+		  var liveCellLives = function() {
+			  return isStatic();
+		  };
+
+		  var deadCellRevives = function () {
+			  return isBornByReproduction();
+		  };
+
+		  var currentCell = workingBoard[rowIndex][columnIndex];
+      if (typeof(currentCell) === "undefined") {
+        console.log("undefined cell. [" + rowIndex + ", " + columnIndex + "]");
+      } else {
+        var isLiveCell = currentCell.marked;
+        var marked;
+
+        if (isLiveCell) {
+            marked = !liveCellDies();
+        } else {
+          marked = isBornByReproduction();
+        }
+
+        workingBoard[rowIndex][columnIndex].marked = marked;
+      }
+	  };
+
+    for (var rowIndex = 0; rowIndex < workingBoard.length; rowIndex++) {
+      var workingBoardRow = workingBoard[rowIndex];
+
+      for (var columnIndex = 0; columnIndex < workingBoardRow.length; columnIndex += 1) {
+        processCellGeneration(rowIndex, columnIndex);
+      }
+	  }
+    console.log(workingBoard);
     };
 
     var updateDisplayBoard = function(workingBoard) {
@@ -59,7 +152,7 @@ gol.engine = {
 
       for (var rowIndex = 0; rowIndex < workingBoard.length; rowIndex++) {
         var workingRow = workingBoard[rowIndex];
-        for (var columnIndex = 0; columnIndex < workingRow.length; columnIndex++) {
+        for (var columnIndex = 0; columnIndex < workingRow.length; columnIndex += 1) {
           updateColumn(workingRow[columnIndex]);
         }
       }
