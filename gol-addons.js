@@ -3,7 +3,11 @@
 ////
 
 gol.addons = {
-  framesPerSecondSlider: function (containerId) {
+  FRAMES_PER_SECOND_CONTAINER_ID:  "framesPerSecondContainer",
+  FANCY_TRANSITIONS_STYLES_ID: "fancyTransitionsStyles",
+  TRACK_AGES_STYLES_ID: "trackAgesStyles",
+
+  addFramesPerSecondSlider: function (containerId) {
     var SLIDER_ID = "framesPerSecond";
     var OUTPUT_ID = SLIDER_ID + "Output";
 
@@ -30,9 +34,14 @@ gol.addons = {
       fpsOutput.setAttribute("for", SLIDER_ID);
       fpsOutput.setAttribute("id", OUTPUT_ID);
 
-      container.appendChild(fpsLabel);
-      container.appendChild(fpsSlider);
-      container.appendChild(fpsOutput);
+      var fpsContainer = document.createElement("span");
+      fpsContainer.setAttribute("id", gol.addons.FRAMES_PER_SECOND_CONTAINER_ID);
+
+      fpsContainer.appendChild(fpsLabel);
+      fpsContainer.appendChild(fpsSlider);
+      fpsContainer.appendChild(fpsOutput);
+
+      container.appendChild(fpsContainer);
     };
 
     var initSliderEvents = function () {
@@ -55,5 +64,58 @@ gol.addons = {
 
     addToContainerId(containerId);
     initSliderEvents();
+  },
+
+  removeFramesPerSecondSlider: function () {
+    document.removeChild(gol.addons.FRAMES_PER_SECOND_CONTAINER_ID);
+  },
+
+  addFancyTransitions: function () {
+    var fancyStyle = document.createElement("style");
+    fancyStyle.setAttribute("type", "text/css");
+    fancyStyle.setAttribute("id", gol.addons.FANCY_TRANSITIONS_STYLES_ID);
+    fancyStyle.innerHTML = " \
+      td { \
+          opacity: 0.2; \
+          transition: opacity 0.4s ease-in; \
+          -ms-transition: opacity 0.4s ease-in; \
+          -moz-transition: opacity 0.4s ease-in; \
+          -webkit-transition: opacity 0.4s ease-in; \
+      } \
+      td.marked { \
+          opacity: 1; \
+          transition: opacity 0.4s ease-out; \
+          -ms-transition: opacity 0.4s ease-out; \
+          -moz-transition: opacity 0.4s ease-out; \
+          -webkit-transition: opacity 0.4s ease-out; \
+      } \
+    ";
+    document.body.appendChild(fancyStyle);
+  },
+
+  removeFancyTransitions: function () {
+    document.removeChild(gol.addons.FANCY_TRANSITIONS_STYLES_ID);
+  },
+
+  addTrackAges: function () {
+
+    var trackAgesStyle = document.createElement("style");
+    trackAgesStyle.setAttribute("type", "text/css");
+    trackAgesStyle.setAttribute("id", gol.addons.TRACK_AGES_STYLES_ID);
+    trackAgesStyle.innerHTML = "td { color: #000000; } td.marked { color: #ffffff }";
+    document.body.appendChild(trackAgesStyle);
+
+    gol.engine.addEventListener(gol.engine.eventNames.UPDATE_CELL, function(ev) {
+      var cell = ev.data;
+      cell.displayBoardColumn.innerHTML = cell.generationsLive;
+    });
+  },
+
+
+  removeTrackAges: function () {
+    gol.engine.removeEventListener(gol.engine.eventNames.UPDATE_CELL, gol.addons.trackAgesUpdateCellEventListener);
+    document.removeChild(gol.addons.TRACK_AGES_STYLES_ID);
+    // TODO: Clear out ages text
   }
+
 };

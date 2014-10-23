@@ -177,7 +177,9 @@
     <script type="text/javascript" src="./gol-addons.js"></script>
     <script type="text/javascript">
       gol.engine.init(document.getElementById("board"));
-      gol.addons.framesPerSecondSlider("runControls");
+      gol.addons.addFramesPerSecondSlider("runControls");
+      gol.addons.addFancyTransitions();
+      gol.addons.addTrackAges();
     </script>
 </body>
 </html>

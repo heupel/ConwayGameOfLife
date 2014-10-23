@@ -5,11 +5,62 @@ if (typeof(gol) === "undefined") {
 
 gol.engine = {
 
+  eventNames  : {
+    UPDATE_CELL: "updateCell"
+  },
+
   gameLoopInterval: null,
 
   framesPerSecond: 6,
 
   displayBoard: null,
+
+  updateEventListeners: [],
+
+  addEventListener: function (eventName, callback) {
+    switch (eventName) {
+      case (gol.engine.eventNames.UPDATE_CELL):
+        gol.engine.updateEventListeners.push(callback);
+        break;
+
+    default:
+      throw new Error("unreconized event name: " + eventName);
+    }
+  },
+
+  removeEventListener: function (eventName, callback) {
+    var callbacks = [];
+    switch (eventName) {
+      case (gol.engine.eventNames.UPDATE_CELL):
+        callbacks = gol.engine.updateEventListeners;
+        break;
+      default:
+        throw new Error("unrecognized event name: " + eventName);
+    }
+
+    var callbackIndex = callbacks.indexOf(callback);
+    if (callbackIndex >= 0) {
+      callbacks.splice(callbackIndex, 1);
+    } else {
+      throw new Error("listener not found");
+    }
+  },
+
+  dispatchEvent: function (eventName, eventData) {
+    var callbacks = [];
+    switch (eventName) {
+      case (gol.engine.eventNames.UPDATE_CELL):
+        callbacks = gol.engine.updateEventListeners;
+        break;
+      default:
+        throw new Error("unrecognized event name: " + eventName);
+    }
+
+    for (var callbackIndex = 0; callbackIndex < callbacks.length; callbackIndex += 1) {
+      var callback = callbacks[callbackIndex];
+      callback( { target: gol.engine, data: eventData });
+    }
+  },
 
   init: function (displayBoard, framesPerSecond) {
     if ((typeof(displayBoard) === "undefined" || displayBoard === null) &&
@@ -35,9 +86,11 @@ gol.engine = {
 
       var processRow = function(displayBoardRow) {
         var processColumn = function(displayBoardColumn) {
+          var isAlive = existingCellIsMarked(displayBoardColumn);
           return {
-            marked: existingCellIsMarked(displayBoardColumn),
-            displayBoardColumn: displayBoardColumn
+            marked: isAlive,
+            displayBoardColumn: displayBoardColumn,
+            generationsLive: isAlive ? 1 : 0
           };
         };
         var workingRow = [];
@@ -147,7 +200,15 @@ gol.engine = {
           marked = isBornByReproduction();
         }
 
-        workingBoard[rowIndex][columnIndex].marked = marked;
+        var updateCellOnWorkingBoard = function (rowIndex, columnIndex, isLiveCell, isMarked) {
+          var cell = workingBoard[rowIndex][columnIndex];
+          cell.marked = isMarked;
+          cell.generationsLive = isMarked ? cell.generationsLive + 1 : 0;
+          gol.engine.dispatchEvent(gol.engine.eventNames.UPDATE_CELL, cell);
+        };
+
+        updateCellOnWorkingBoard(rowIndex, columnIndex, isLiveCell, marked);
+
       }
 	  };
 
