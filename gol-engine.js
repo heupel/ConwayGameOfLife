@@ -7,7 +7,26 @@ gol.engine = {
 
   gameLoopInterval: null,
 
-  start: function(displayBoard, framesPerSecond) {
+  framesPerSecond: 6,
+
+  displayBoard: null,
+
+  init: function (displayBoard, framesPerSecond) {
+    if ((typeof(displayBoard) === "undefined" || displayBoard === null) &&
+        gol.engine.displayBoard === null) {
+      throw new Error("displayBoard is required to be set to start the game engine");
+    } else if (!(typeof(displayBoard) === "undefined" || displayBoard === null)) {
+      gol.engine.displayBoard = displayBoard;
+    }
+
+    if (typeof(framesPerSecond) === "undefined" || framesPerSecond === null) {
+      // Use what's already set
+    } else {
+      gol.engine.framesPerSecond = framesPerSecond;
+    }
+  },
+
+  start: function() {
     var existingCellIsMarked = function (displayBoardCell) {
       return displayBoardCell.classList.contains("marked");
     };
@@ -33,7 +52,7 @@ gol.engine = {
 
       var workingBoard = [];
 
-      var displayBoardRows = displayBoard.getElementsByTagName("tr");
+      var displayBoardRows = gol.engine.displayBoard.getElementsByTagName("tr");
 
       for (var rowIndex = 0; rowIndex < displayBoardRows.length; rowIndex++) {
         var workingRow = processRow(displayBoardRows[rowIndex]);
@@ -44,15 +63,14 @@ gol.engine = {
     };
 
 
-    var workingBoard = translateDisplayBoardToWorkingBoard(displayBoard);
+    var workingBoard = translateDisplayBoardToWorkingBoard(gol.engine.displayBoard);
 
-    var renderInterval = Math.floor(1000/framesPerSecond);
+    var renderInterval = Math.floor(1000/gol.engine.framesPerSecond);
 
     var processGeneration = function(workingBoard) {
       console.log("doing work: " + Date.now());
 
 	  var processCellGeneration = function (rowIndex, columnIndex) {
-      console.log(rowIndex + " " + columnIndex);
 		  // ---RULES---
 		  // Any live cell with fewer than two live neighbours dies, as if caused by under-population.
 		  // Any live cell with two or three live neighbours lives on to the next generation.
@@ -61,7 +79,6 @@ gol.engine = {
 		  var getLiveNeighborCount = function () {
 			  var getLiveMembersInRowColumnRange = function (currentRowIndex, startColumnIndex, endColumnIndex) {
 				  var liveCells = 0;
-          console.log("live members in row: " + currentRowIndex + " " + startColumnIndex + " " + endColumnIndex);
 
 				  for (var currentColumnIndex = startColumnIndex; currentColumnIndex <= endColumnIndex; currentColumnIndex += 1) {
 					  if ((rowIndex != currentRowIndex || columnIndex != currentColumnIndex) &&
@@ -119,7 +136,7 @@ gol.engine = {
 
 		  var currentCell = workingBoard[rowIndex][columnIndex];
       if (typeof(currentCell) === "undefined") {
-        console.log("undefined cell. [" + rowIndex + ", " + columnIndex + "]");
+        throw new Error("undefined cell. [" + rowIndex + ", " + columnIndex + "]");
       } else {
         var isLiveCell = currentCell.marked;
         var marked;
@@ -141,7 +158,6 @@ gol.engine = {
         processCellGeneration(rowIndex, columnIndex);
       }
 	  }
-    console.log(workingBoard);
     };
 
     var updateDisplayBoard = function(workingBoard) {
@@ -167,6 +183,7 @@ gol.engine = {
 
   stop: function(reason) {
     clearInterval(this.gameLoopInterval);
+    this.gameLoopInterval = null;
     console.log("Stopping because: " + reason);
   }
 

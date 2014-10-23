@@ -106,8 +106,6 @@
                 stop: "Stop"
               };
 
-              var FRAMES_PER_SECOND = 6;
-
               var startButton = document.getElementById('runButton');
               if (startButton === null) {
                 throw new Error("No start button found.");
@@ -120,7 +118,7 @@
 
                 if (startButton.innerHTML === START_BUTTON_STATES.start) {
                   startButton.innerHTML = START_BUTTON_STATES.stop;
-                  gol.engine.start(board, FRAMES_PER_SECOND);
+                  gol.engine.start();
                 }
                 else {
                   startButton.innerHTML = START_BUTTON_STATES.start;
@@ -176,5 +174,10 @@
     </script>
 
     <script type="text/javascript" src="./gol-engine.js"></script>
+    <script type="text/javascript" src="./gol-addons.js"></script>
+    <script type="text/javascript">
+      gol.engine.init(document.getElementById("board"));
+      gol.addons.framesPerSecondSlider("runControls");
+    </script>
 </body>
 </html>
